@@ -23,7 +23,7 @@ android {
     buildFeatures {
         dataBinding = true
         viewBinding = true
-        compose = true
+        compose = false
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
@@ -35,21 +35,14 @@ dependencies {
     api(project(":android-flowlayout"))
 
     // AndroidX
-    api("androidx.appcompat:appcompat:+")
-    api("androidx.fragment:fragment-ktx:+")
-    api("androidx.activity:activity-compose:+")
-    api("androidx.constraintlayout:constraintlayout:+")
-    api("com.google.android.material:material:+")
-
-    // Compose
-    api("androidx.compose.ui:ui:+")
-    api("androidx.compose.ui:ui-graphics:+")
-    api("androidx.compose.ui:ui-tooling-preview:+")
-    api("androidx.compose.material3:material3:+")
-    api(platform("androidx.compose:compose-bom:+"))
+    api("androidx.appcompat:appcompat:1.7.0")
+    api("androidx.activity:activity:1.9.0")
+    api("androidx.fragment:fragment:1.7.0")
+    api("androidx.constraintlayout:constraintlayout-core:1.0.4")
+    api("com.google.android.material:material:1.12.0")
 
     // Kotlin
-    implementation("androidx.core:core-ktx:1.13.1")
+    api("androidx.core:core-ktx:1.13.1")
 
     // Coroutine
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:+")
