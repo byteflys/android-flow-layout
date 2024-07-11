@@ -1,0 +1,16 @@
+plugins {
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
+}
+
+android {
+    compileSdk = 34
+    defaultConfig {
+        namespace = "com.android.library.flowlayout"
+        minSdk = 30
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
