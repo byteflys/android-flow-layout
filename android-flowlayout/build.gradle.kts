@@ -9,8 +9,10 @@ android {
         namespace = "com.android.library.flowlayout"
         minSdk = 30
     }
-
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+    sourceSets {
+        getByName("main").java.srcDirs("src/main/commons")
     }
 }

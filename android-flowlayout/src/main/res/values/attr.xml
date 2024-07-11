@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="skinnable" format="boolean" />
-    <attr name="provider" format="string" />
+    <attr name="itemMarginX" format="dimension|reference" />
+    <attr name="itemMarginY" format="dimension|reference" />
+    <declare-styleable name="FlowLayout">
+        <attr name="itemMarginX" />
+        <attr name="itemMarginY" />
+    </declare-styleable>
 </resources>
