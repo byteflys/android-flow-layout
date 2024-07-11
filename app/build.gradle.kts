@@ -32,7 +32,7 @@ android {
 
 dependencies {
 
-    api(project("android-flowlayout"))
+    api(project(":android-flowlayout"))
 
     // AndroidX
     api("androidx.appcompat:appcompat:+")
