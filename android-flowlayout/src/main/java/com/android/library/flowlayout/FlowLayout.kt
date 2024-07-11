@@ -37,14 +37,16 @@ class FlowLayout : ViewGroup {
 
     override fun onMeasure(wSpec: Int, hSpec: Int) {
 
-        //解析测量参数
+        // measure spec for layout
         val modeW = MeasureSpec.getMode(wSpec)
         val modeH = MeasureSpec.getMode(hSpec)
         val sizeW = MeasureSpec.getSize(wSpec)
         val sizeH = MeasureSpec.getSize(hSpec)
 
-        //瀑布布局必须明确指定宽高
-        if (modeW != MeasureSpec.EXACTLY) throw RuntimeException("FallsLayout must exactly specify width")
+        // flow layout must have a definite width
+        // in order to decide where to wrap line
+        if (modeW != MeasureSpec.EXACTLY)
+            throw RuntimeException("flow layout must have an exactly width, please use fixed width or match_parent")
         parentWidth = sizeW
 
         //添加起始位置
