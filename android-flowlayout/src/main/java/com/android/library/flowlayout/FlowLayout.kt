@@ -73,11 +73,10 @@ class FlowLayout : ViewGroup {
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        //循环遍历子View，测量总尺寸
         for (i in 0 until childCount) {
             val child = getChildAt(i)
             val lp = child.layoutParams as MarginLayoutParams
-            val rect: Rect? = rects[i]
+            val rect = rects[i]
             child.layout(rect.left + lp.leftMargin, rect.top + lp.topMargin, rect.right - lp.rightMargin, rect.bottom - lp.bottomMargin)
         }
     }
@@ -87,23 +86,22 @@ class FlowLayout : ViewGroup {
     // if not crossed with other items, and width is inside parent, it is ok
     // else break to new line
     private fun findLocateBound(w: Int, h: Int): Rect {
-        for (x1 in xList) for (i in 0 until yList.size - 1) {
-            val y1 = yList[i]
-            val x2 = x1 + w
-            val y2 = y1 + h
-            //判断是否相交
-            val rect: Rect = Rect(x1, y1, x2, y2)
-            var cross = false
-            breakPoint@ for (usedRect in rects) if (Rect.isCrossed(rect, usedRect)) {
-                cross = true
-                break@breakPoint
-            }
-            //不相交，不超出parent宽度，则可以放置在此位置
-            if (!cross) if (x2 <= parentWidth - paddingRight + Dimens.toPx(1)) //防止float和int转换时精度丢失，条件放宽松点
-                return rect
-        }
-        //其它点都不合适，切换到最底部显示
-        return Rect(paddingLeft, yList.last, paddingLeft + w, yList.last + h)
+        for (x in xList)
+            for (y in yList)
+                if (!intersect(x, y, w, h))
+                    return Rect(x, y, x + w, y + h)
+        val startX = itemMarginX
+        val startY = yList.last() + itemMarginY
+        return Rect(startX, startY, startX + w, startY + h)
+    }
+
+    // intersect with other items
+    private fun intersect(x: Int, y: Int, w: Int, h: Int): Boolean {
+        val rect = Rect(x, y, x + w, y + h)
+        for (usedRect in rects)
+            if (rect.intersect(usedRect))
+                return true
+        return false
     }
 
     private fun saveMeasuredRect(rect: Rect) {
@@ -121,5 +119,3 @@ class FlowLayout : ViewGroup {
             list.add(index, value)
     }
 }
-
-
