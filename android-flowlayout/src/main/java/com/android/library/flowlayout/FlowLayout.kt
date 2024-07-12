@@ -28,8 +28,8 @@ class FlowLayout : ViewGroup {
 
     private fun init(context: Context, attributeSet: AttributeSet?) {
         val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.FlowLayout)
-        itemMarginX = typedArray.getDimension(R.styleable.FlowLayout_itemMarginX, 0f).toInt() + paddingLeft
-        itemMarginY = typedArray.getDimension(R.styleable.FlowLayout_itemMarginY, 0f).toInt() + paddingTop
+        itemMarginX = typedArray.getDimension(R.styleable.FlowLayout_itemMarginX, 0f).toInt()
+        itemMarginY = typedArray.getDimension(R.styleable.FlowLayout_itemMarginY, 0f).toInt()
         typedArray.recycle()
     }
 
@@ -51,8 +51,8 @@ class FlowLayout : ViewGroup {
         xList.clear()
         yList.clear()
         rects.clear()
-        xList.add(itemMarginX)
-        yList.add(itemMarginY)
+        xList.add(itemMarginX + paddingLeft)
+        yList.add(itemMarginY + paddingTop)
 
         // measure child size and location
         for (i in 0 until childCount) {
@@ -90,7 +90,7 @@ class FlowLayout : ViewGroup {
             for (y in yList)
                 if (!intersect(x, y, w, h))
                     return Rect(x, y, x + w, y + h)
-        val startX = itemMarginX
+        val startX = itemMarginX + paddingLeft
         val startY = yList.last() + itemMarginY
         return Rect(startX, startY, startX + w, startY + h)
     }
