@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.ViewGroup
-import java.util.LinkedList
 
 // A layout that enable auto-wrap on line end
 class FlowLayout : ViewGroup {
@@ -12,11 +11,10 @@ class FlowLayout : ViewGroup {
     private var itemMarginX = 0
     private var itemMarginY = 0
 
-    private val lock = Any()
-
-    // location and bound of view
+    // all cross points
     private val xList = mutableListOf<Int>()
     private val yList = mutableListOf<Int>()
+    // bound of measured view
     private val rects = mutableListOf<Rect>()
 
     private var parentWidth = 0
@@ -30,8 +28,8 @@ class FlowLayout : ViewGroup {
 
     private fun init(context: Context, attributeSet: AttributeSet?) {
         val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.FlowLayout)
-        itemMarginX = typedArray.getDimension(R.styleable.FlowLayout_itemMarginX, 0f).toInt()
-        itemMarginY = typedArray.getDimension(R.styleable.FlowLayout_itemMarginY, 0f).toInt()
+        itemMarginX = typedArray.getDimension(R.styleable.FlowLayout_itemMarginX, 0f).toInt() + paddingLeft
+        itemMarginY = typedArray.getDimension(R.styleable.FlowLayout_itemMarginY, 0f).toInt() + paddingTop
         typedArray.recycle()
     }
 
@@ -49,31 +47,28 @@ class FlowLayout : ViewGroup {
             throw RuntimeException("flow layout must have an exactly width, please use fixed width or match_parent")
         parentWidth = sizeW
 
-        //添加起始位置
+        // add start location
         xList.clear()
         yList.clear()
         rects.clear()
-        xList.add(paddingLeft)
-        yList.add(paddingTop)
+        xList.add(itemMarginX)
+        yList.add(itemMarginY)
 
-        //循环遍历子View，测量总尺寸
+        // measure child size and location
         for (i in 0 until childCount) {
             val child = getChildAt(i)
-            val lp = child.layoutParams as MarginLayoutParams
             measureChild(child, wSpec, hSpec)
-            val w = child.measuredWidth + lp.leftMargin + lp.rightMargin
-            val h = child.measuredHeight + lp.topMargin + lp.bottomMargin
-            val rect: Rect = findRect(w, h)
+            val w = child.measuredWidth
+            val h = child.measuredHeight
+            val rect = findLocateBound(w, h)
             rects.add(rect)
-            insertValue(rect.left, xList)
-            insertValue(rect.right, xList)
-            insertValue(rect.top, yList)
-            insertValue(rect.bottom, yList)
+            saveMeasuredRect(rect)
         }
 
-        //确定最终ViewGroup高度
-        var contentHeight = yList.last + paddingBottom
-        if (modeH == MeasureSpec.AT_MOST && sizeH < contentHeight) contentHeight = sizeH
+        // measure layout height
+        var contentHeight = yList.last() + paddingBottom
+        if (modeH == MeasureSpec.AT_MOST && contentHeight > sizeH)
+            contentHeight = sizeH
         super.setMeasuredDimension(sizeW, contentHeight)
     }
 
@@ -87,44 +82,43 @@ class FlowLayout : ViewGroup {
         }
     }
 
-    //查找空白区域
-    //尝试以每个边界点作为起点
-    //如果和其它控件都不相交，也不超出parent宽度，则使用此边界点作为起点
-    //否则切换到最底行最左侧显示
-    protected fun findRect(w: Int, h: Int): Rect {
-        synchronized(lock) {
-            for (x1 in xList) for (i in 0 until yList.size - 1) {
-                val y1 = yList[i]
-                val x2 = x1 + w
-                val y2 = y1 + h
-                //判断是否相交
-                val rect: Rect = Rect(x1, y1, x2, y2)
-                var cross = false
-                breakPoint@ for (usedRect in rects) if (Rect.isCrossed(rect, usedRect)) {
-                    cross = true
-                    break@breakPoint
-                }
-                //不相交，不超出parent宽度，则可以放置在此位置
-                if (!cross) if (x2 <= parentWidth - paddingRight + Dimens.toPx(1)) //防止float和int转换时精度丢失，条件放宽松点
-                    return rect
+    // find where to place new item
+    // try with each cross point one by one, as the start point
+    // if not crossed with other items, and width is inside parent, it is ok
+    // else break to new line
+    private fun findLocateBound(w: Int, h: Int): Rect {
+        for (x1 in xList) for (i in 0 until yList.size - 1) {
+            val y1 = yList[i]
+            val x2 = x1 + w
+            val y2 = y1 + h
+            //判断是否相交
+            val rect: Rect = Rect(x1, y1, x2, y2)
+            var cross = false
+            breakPoint@ for (usedRect in rects) if (Rect.isCrossed(rect, usedRect)) {
+                cross = true
+                break@breakPoint
             }
-            //其它点都不合适，切换到最底部显示
-            return Rect(paddingLeft, yList.last, paddingLeft + w, yList.last + h)
+            //不相交，不超出parent宽度，则可以放置在此位置
+            if (!cross) if (x2 <= parentWidth - paddingRight + Dimens.toPx(1)) //防止float和int转换时精度丢失，条件放宽松点
+                return rect
         }
+        //其它点都不合适，切换到最底部显示
+        return Rect(paddingLeft, yList.last, paddingLeft + w, yList.last + h)
     }
 
-    //记录临界点
-    protected fun insertValue(value: Int, intList: LinkedList<Int>) {
-        var index = -1
-        for (i in intList.size downTo 1) {
-            val item = intList[i - 1]
-            if (item == value) break
-            if (item < value) {
-                index = i
-                break
-            }
-        }
-        if (index >= 0) intList.add(index, value)
+    private fun saveMeasuredRect(rect: Rect) {
+        saveCrossCoordinate(rect.left, xList)
+        saveCrossCoordinate(rect.right, xList)
+        saveCrossCoordinate(rect.top, yList)
+        saveCrossCoordinate(rect.bottom, yList)
+    }
+
+    // save new cross point coordinate
+    // if exists, skip save
+    private fun saveCrossCoordinate(value: Int, list: MutableList<Int>) {
+        var index = Maths.findInsertIndexAsc(list, value)
+        if (index >= 0)
+            list.add(index, value)
     }
 }
 
