@@ -1,6 +1,6 @@
-package kotlin
+package commons.kotlin
 
-typealias CommonMaths = kotlin.Maths
+typealias CommonMaths = commons.kotlin.Maths
 
 object Maths {
 

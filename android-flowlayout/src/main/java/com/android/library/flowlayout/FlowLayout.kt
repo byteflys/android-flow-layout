@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.ViewGroup
+import commons.android.Views.layout
+import commons.kotlin.Maths
 
 // A layout that enable auto-wrap on line end
 class FlowLayout : ViewGroup {
@@ -55,29 +57,34 @@ class FlowLayout : ViewGroup {
         yList.add(itemMarginY + paddingTop)
 
         // measure child size and location
+        var minY = itemMarginY
         for (i in 0 until childCount) {
             val child = getChildAt(i)
             measureChild(child, wSpec, hSpec)
             val w = child.measuredWidth
             val h = child.measuredHeight
-            val rect = findLocateBound(w, h)
+            val rect = findLocateBound(w, h, sizeW, minY)
             rects.add(rect)
+            minY = rect.top
             saveMeasuredRect(rect)
         }
 
         // measure layout height
-        var contentHeight = yList.last() + paddingBottom
-        if (modeH == MeasureSpec.AT_MOST && contentHeight > sizeH)
+        var contentHeight = sizeH
+        if (modeH == MeasureSpec.EXACTLY)
             contentHeight = sizeH
+        if (modeH == MeasureSpec.UNSPECIFIED)
+            contentHeight = yList.last() + paddingBottom
+        if (modeH == MeasureSpec.AT_MOST)
+            contentHeight = (yList.last() + paddingBottom).coerceAtMost(sizeH)
         super.setMeasuredDimension(sizeW, contentHeight)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         for (i in 0 until childCount) {
             val child = getChildAt(i)
-            val lp = child.layoutParams as MarginLayoutParams
             val rect = rects[i]
-            child.layout(rect.left + lp.leftMargin, rect.top + lp.topMargin, rect.right - lp.rightMargin, rect.bottom - lp.bottomMargin)
+            child.layout(rect)
         }
     }
 
@@ -85,11 +92,13 @@ class FlowLayout : ViewGroup {
     // try with each cross point one by one, as the start point
     // if not crossed with other items, and width is inside parent, it is ok
     // else break to new line
-    private fun findLocateBound(w: Int, h: Int): Rect {
-        for (x in xList)
-            for (y in yList)
-                if (!intersect(x, y, w, h))
-                    return Rect(x, y, x + w, y + h)
+    private fun findLocateBound(w: Int, h: Int, maxWidth: Int, minY: Int): Rect {
+        for (y in yList)
+            if (y >= minY)
+                for (x in xList)
+                    if (x + w <= maxWidth)
+                        if (!intersect(x, y, w, h))
+                            return Rect(x, y, x + w, y + h)
         val startX = itemMarginX + paddingLeft
         val startY = yList.last() + itemMarginY
         return Rect(startX, startY, startX + w, startY + h)
@@ -106,9 +115,9 @@ class FlowLayout : ViewGroup {
 
     private fun saveMeasuredRect(rect: Rect) {
         saveCrossCoordinate(rect.left, xList)
-        saveCrossCoordinate(rect.right, xList)
+        saveCrossCoordinate(rect.right + itemMarginX, xList)
         saveCrossCoordinate(rect.top, yList)
-        saveCrossCoordinate(rect.bottom, yList)
+        saveCrossCoordinate(rect.bottom + itemMarginY, yList)
     }
 
     // save new cross point coordinate

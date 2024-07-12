@@ -18,4 +18,9 @@ class HomeActivity : AppCompatActivity() {
     private fun initView() {
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        binding.root.forceLayout()
+    }
 }
