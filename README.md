@@ -90,7 +90,7 @@ api("io.github.hellogoogle2000:android-flowlayout:1.0.3")
 
 #### 3. Convert View from Data
 
-you are also enabled to create view from a data set dynamically, but not layout
+you are also enabled to create view from a data set dynamically
 
 ```kotlin
 val simulated = mutableListOf<String>().apply {
