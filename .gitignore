@@ -1,7 +1,7 @@
 **/build
-**/build/*
 **/.idea
 **/.gradle
 **/.local
-**/.DS_Store
 **/local.properties
+**/.DS_Store
+**/*.hprof
