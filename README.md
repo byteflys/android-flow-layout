@@ -1,6 +1,6 @@
 # About this Project
 
-An android auto-adaptive layout
+An android auto-adaptive layout library
 
 # Core Ability
 
@@ -108,4 +108,5 @@ binding.flowLayout.applyViewAdapter({ Button(this) }, simulated) { view, data ->
 # Preview
 
 <img src="https://github.com/user-attachments/assets/4928f382-8180-47d4-af93-1697335bd197" height="250"><br>
-<img src="https://github.com/user-attachments/assets/8d07cdc9-79da-43f5-8c38-59fba53cf0a5" height="400" width="800">
+<img src="https://github.com/user-attachments/assets/8d07cdc9-79da-43f5-8c38-59fba53cf0a5" height="250"><br>
+<img src="https://github.com/user-attachments/assets/07d80c3d-aad8-42f5-ab16-f88e853c7fad" height="250">
