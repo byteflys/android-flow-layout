@@ -4,8 +4,8 @@ import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.ViewGroup
-import commons.android.Views.layout
-import commons.kotlin.Maths
+import com.android.library.flowlayout.commons.android.Views.layout
+import com.android.library.flowlayout.commons.kotlin.Maths
 
 // A layout that enable auto-wrap on line end
 class FlowLayout : ViewGroup {

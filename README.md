@@ -1,3 +1,28 @@
+# About this Project
+
+An android auto-adaptive layout
+
+# Core Ability
+
+Auto wrap line when item reach parent end
+
+# Attributes
+
+- itemMarginX, padding between each column
+- itemMarginY, padding between each row
+- item margins will be ignored, you can use padding or wrapper view instead
+
+# Steps for Integration
+
+#### 1. Dependency
+
+```kotlin
+api("io.github.hellogoogle2000:android-flowlayout:1.0.3")
+```
+
+#### 2. Apply in Xml Layout
+
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -43,7 +68,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:layout_width="90dp"
+            android:layout_width="190dp"
             android:layout_height="30dp"
             android:background="#22FF0000"
             android:gravity="center"
@@ -59,50 +84,28 @@
             android:text="5"
             android:textSize="20dp"
             android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="50dp"
-            android:layout_height="30dp"
-            android:background="#22FF0000"
-            android:gravity="center"
-            android:text="6"
-            android:textSize="20dp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="80dp"
-            android:layout_height="30dp"
-            android:background="#22FF0000"
-            android:gravity="center"
-            android:text="7"
-            android:textSize="20dp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="130dp"
-            android:layout_height="30dp"
-            android:background="#22FF0000"
-            android:gravity="center"
-            android:text="8"
-            android:textSize="20dp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="90dp"
-            android:layout_height="30dp"
-            android:background="#22FF0000"
-            android:gravity="center"
-            android:text="9"
-            android:textSize="20dp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="80dp"
-            android:layout_height="30dp"
-            android:background="#22FF0000"
-            android:gravity="center"
-            android:text="10"
-            android:textSize="20dp"
-            android:textStyle="bold" />
     </com.android.library.flowlayout.FlowLayout>
 </LinearLayout>
+```
+
+#### 3. Convert View from Data
+
+you are also enabled to create view from a data set dynamically, but not layout
+
+```kotlin
+val simulated = mutableListOf<String>().apply {
+    for (i in 0 until 30)
+        add(UUID.randomUUID().toString())
+}
+binding.flowLayout.applyViewAdapter({ Button(this) }, simulated) { view, data ->
+    view.text = data
+    view.setPadding(15, 15, 15, 15)
+    val lp = view.layoutParams
+    lp.width = ViewGroup.LayoutParams.WRAP_CONTENT
+    lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
+}
+```
+# Preview
+
+<img src="https://github.com/user-attachments/assets/4928f382-8180-47d4-af93-1697335bd197" height="250"><br>
+<img src="https://github.com/user-attachments/assets/8d07cdc9-79da-43f5-8c38-59fba53cf0a5" height="400" width="800">

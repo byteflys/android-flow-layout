@@ -1,9 +1,9 @@
-package commons.android
+package com.android.library.flowlayout.commons.android
 
 import android.graphics.Rect
 import android.view.View
 
-object Views {
+internal object Views {
 
     fun View.layout(rect: Rect) = layout(rect.left, rect.top, rect.right, rect.bottom)
 }

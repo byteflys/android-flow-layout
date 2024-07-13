@@ -1,8 +1,6 @@
-package commons.kotlin
+package com.android.library.flowlayout.commons.kotlin
 
-typealias CommonMaths = commons.kotlin.Maths
-
-object Maths {
+internal object Maths {
 
     fun findInsertIndexAsc(list: List<Int>, value: Int): Int {
         for (i in list.size downTo 1) {
